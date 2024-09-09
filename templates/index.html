@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order ID Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #orders {
+            margin-top: 20px;
+        }
+        .order-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .loading {
+            font-style: italic;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Creator</h1>
+    <button onclick="sendConcurrentRequests()">Create Orders</button>
+    <br></br>
+    <div id="status" class="loading">Click the button to start generating orders...</div>
+    <div id="orders"></div>
+    <script>
+        async function generateOrder() {
+        try {
+            const response = await fetch('/create-order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1],
+                },
+                body: JSON.stringify({})
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.order_id;
+        } catch (error) {
+            console.error('Error generating order:', error);
+            return null;
+        }
+    }
+
+    async function sendConcurrentRequests() {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = 'Generating orders, please wait...';
+
+        const orderDiv = document.getElementById('orders');
+        orderDiv.innerHTML = '';
+
+        const orderCount = 50;
+        const orderPromises = [];
+        for (let i = 0; i < orderCount; i++) {
+            orderPromises.push(generateOrder());
+        }
+        const orders = await Promise.all(orderPromises);
+        orders.forEach(order_id => {
+            if (order_id) {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerText = `Order ID: ${order_id}`;
+                orderDiv.appendChild(orderItem);
+            }
+        });
+        statusDiv.innerText = `Generated ${orders.length} orders.`;
+    }
+    </script>
+</body>
+</html>
+
+
