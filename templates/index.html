@@ -28,6 +28,7 @@
 <body>
     <h1>Order Creator</h1>
     <button onclick="sendConcurrentRequests()">Create Orders</button>
+    {% csrf_token %}
     <br></br>
     <div id="status" class="loading">Click the button to start generating orders...</div>
     <div id="orders"></div>
@@ -38,7 +39,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1],
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
                 },
                 body: JSON.stringify({})
             });
