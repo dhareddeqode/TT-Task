@@ -14,5 +14,4 @@ createsupseruser:
 	docker compose exec -it web python manage.py createsuperuser --email=admin@test.com --username=admin
 
 runtests:
-	docker compose -f docker-compose.yaml -f docker-compose.test.yaml up --abort-on-container-exit --exit-code-from web
-
+	docker compose -f docker-compose.test.yaml up --abort-on-container-exit --exit-code-from web-test

@@ -1,43 +1,55 @@
 version: '3.8'
 
 services:
-  postgres:
+  postgres-test:
+    image: postgres
     environment:
       POSTGRES_USER: ${SQL_USER}
       POSTGRES_DB: ${SQL_DATABASE}
       POSTGRES_PASSWORD: ${SQL_PASSWORD}
     networks:
       - orders-hub-network-test
-    env_file:
-      - ./.env.test
+    volumes:
+      - local_postgres_data_test:/var/lib/postgresql/data:Z
     ports:
       - "5433:5432"
+    env_file:
+      - ./.env.test
+    command: -p 5433
 
-  redis:
+  redis-test:
+    image: redis:6.2
+    volumes:
+      - redis_data_test:/data
+    command: --port 6380
+    networks:
+      - orders-hub-network-test
     ports:
       - "6380:6379"
 
-  web:
-    environment:
-      DJANGO_SETTINGS_MODULE: OrdersHub.settings
+  web-test:
+    build:
+      context: .
+    ports:
+      - "8001:8000"
+    networks:
+      - orders-hub-network-test
+    env_file:
+      - ./.env.test
     command:
       - bash
       - -c
       - |
-        while !</dev/tcp/postgres/5432; do sleep 1; done;
-        while !</dev/tcp/redis/6379; do sleep 1; done;
-        python manage.py test --noinput  # Run the tests without any input
+        while !</dev/tcp/postgres-test/5433; do sleep 1; done;
+        while !</dev/tcp/redis-test/6380; do sleep 1; done;
+        python manage.py migrate;
+        python manage.py test --no-input
     volumes:
       - .:/orders_hub
-    networks:
-      - orders-hub-network-test
     depends_on:
-      - postgres
-      - redis
-    env_file:
-      - ./.env.test
-    ports:
-      - "8001:8000"
+      - postgres-test
+      - redis-test
+    restart: always
 
 volumes:
   local_postgres_data_test: {}
