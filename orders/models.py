@@ -1,7 +1,8 @@
 from datetime import datetime
+
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.conf import settings
 from django.db.utils import IntegrityError
 
 
@@ -20,11 +21,7 @@ class Order(models.Model):
     def __str__(self):
         return self.order_id
 
-    def save(
-        self,
-        *args,
-        **kwargs
-    ):
+    def save(self, *args, **kwargs):
         if self.order_id:
             return super().save(*args, **kwargs)
 
@@ -56,11 +53,12 @@ class Order(models.Model):
 
     @classmethod
     def get_sequence_from_db(cls):
-        if order := cls.objects.filter(created_at__date=datetime.today()).latest("created_at"):
+        if order := cls.objects.filter(created_at__date=datetime.today()).latest(
+            "created_at"
+        ):
             return order.get_order_sequence + 1
         return 1
 
     @property
     def get_order_sequence(self):
-        return int(self.order_id.split('-')[-1])
-
+        return int(self.order_id.split("-")[-1])

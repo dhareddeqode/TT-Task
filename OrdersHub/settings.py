@@ -34,7 +34,7 @@ ROOT_URLCONF = "OrdersHub.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -61,23 +61,23 @@ DATABASES = {
     }
 }
 
-REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PORT = int(os.getenv('REDIS_PORT'))
-REDIS_DB = int(os.getenv('REDIS_DB'))
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = int(os.getenv("REDIS_PORT"))
+REDIS_DB = int(os.getenv("REDIS_DB"))
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-        }
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+        },
     }
 }
 
-ORDER_SEQUENCE_EXPIRY = 60 * 60 * 24   # 24 hours
+ORDER_SEQUENCE_EXPIRY = 60 * 60 * 24  # 24 hours
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
